@@ -1,5 +1,7 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { AccountsService } from '../accounts.service';
+declare const $:any;
 
 @Component({
   selector: 'app-manageproduct',
@@ -28,10 +30,18 @@ export class ManageproductComponent implements OnInit {
 
   catval:string;
 
-  constructor(private catsrvobj:AccountsService) { }
+  constructor(private catsrvobj:AccountsService,private myhttp:HttpClient) { }
 
   ngOnInit(): void {
     this.fetchcat();
+    this.flag=false;
+    this.category="";
+    this.subcat="";
+    this.prodname="";
+    this.rate="";
+    this.disc="";
+    this.stock="";
+    this.description="";
     // this.fetchsubcat();
     
   }
@@ -44,8 +54,9 @@ export class ManageproductComponent implements OnInit {
 
   addproduct()
   {
-    var mydata= new FormData
+    $("#mssg").fadeIn(1000).fadeOut(2500);
 
+    var mydata= new FormData
     mydata.append("catname",this.category);
     mydata.append("subcatname",this.subcat);
     mydata.append("prodname",this.prodname);
@@ -58,6 +69,7 @@ export class ManageproductComponent implements OnInit {
     this.catsrvobj.saveprod2db(mydata).subscribe({
       next:(res)=>{
         this.msg= res;
+        setTimeout(() => { this.ngOnInit() }, 1500);
         
       },
       error:(err)=>{
@@ -137,8 +149,27 @@ export class ManageproductComponent implements OnInit {
     })
   }
 
-  proddelete(){
-
+  proddelete(prodid)
+  {
+      // alert(catid);
+      var confrm= confirm("Are you sure want to delete?");
+      if(confrm)
+      {
+          //note that we get a json object only as a response and not an array of objects
+          this.myhttp.delete("http://localhost:3000/delprod?prodid="+prodid,{responseType:"json"}).subscribe({
+            next:(res)=>{
+              if(res["deletedCount"] == 1)
+              {
+                alert("Product Deleted Successfully!")
+                this.ngOnInit();
+                //this was the best part of todays lecture used to refresh the componenet
+              }
+            },
+            error:(err)=>{
+              this.msg=err;
+            }
+          })
+      }
   }
 
 }

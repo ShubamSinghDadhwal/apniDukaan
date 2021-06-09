@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { ActivateComponent } from './activate/activate.component';
 import { AddadminComponent } from './addadmin/addadmin.component';
 import { AddsubcatComponent } from './addsubcat/addsubcat.component';
 import { AdminheaderComponent } from './adminheader/adminheader.component';
@@ -147,6 +148,10 @@ const routes: Routes = [
   {
     path:"contactus",
     component:ContactusComponent
+  },
+  {
+    path:"activate",
+    component:ActivateComponent
   },
 ];
 

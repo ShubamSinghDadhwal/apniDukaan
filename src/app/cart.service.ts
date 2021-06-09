@@ -66,4 +66,10 @@ export class CartService {
     return this.myhttp.put(Conn.nodeurl+ "/updatetorderstatus",data,{responseType:"json"})
   }
 
+  updatecart(data)
+  {
+    return this.myhttp.put(Conn.nodeurl+ "/updatecart",data,{responseType:"json"})
+  }
+
+
 }

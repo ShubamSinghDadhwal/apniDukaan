@@ -102,4 +102,14 @@ export class AccountsService {
     return this.myhttp.get(Conn.nodeurl+"/fetchproddetailsbyid?prodid="+prodid, {responseType:"json"})
   }
 
+  activateaccount(hashval)
+  {
+    return this.myhttp.put(Conn.nodeurl+"/activateaccount", hashval, {responseType:"json"});
+  }
+
+  updateproduct(updatedData)
+  {
+    return this.myhttp.put(Conn.nodeurl+"/updateprod", updatedData, {responseType:"json"});
+  }
+
 }

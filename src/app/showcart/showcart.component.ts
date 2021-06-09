@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { CartService } from '../cart.service';
 
@@ -13,11 +14,11 @@ export class ShowcartComponent implements OnInit {
   flag:boolean;
   gtotal:number=0;
   
-  constructor(private cartsrvobj:CartService) {
-    this.getcart();
+  constructor(private cartsrvobj:CartService,private myhttp:HttpClient) {
    }
 
   ngOnInit(): void {
+    this.getcart();
   }
 
   getcart()
@@ -34,6 +35,7 @@ export class ShowcartComponent implements OnInit {
           {
             this.cartprods=resp;
             this.flag=true;
+            this.gtotal=0;
             for(var i=0;i<this.cartprods.length;i++)
             {
               this.gtotal+=this.cartprods[i]["totalcost"];
@@ -47,6 +49,30 @@ export class ShowcartComponent implements OnInit {
         }
       }
     )
+  }
+
+  ondelete(prodid)
+  {
+      //  alert(prodid)
+
+      var confrm= confirm("Are you sure want to delete?");
+      if(confrm)
+      {
+          //note that we get a json object only as a response and not an array of objects
+          this.myhttp.delete("http://localhost:3000/delcartprod?prodid="+prodid,{responseType:"json"}).subscribe({
+            next:(res)=>{
+              if(res["deletedCount"] == 1)
+              {
+                alert("Item Deleted Successfully!")
+                this.ngOnInit();
+                //this was the best part of todays lecture used to refresh the componenet
+              }
+            },
+            error:(err)=>{
+              this.msg=err;
+            }
+          })
+      }
   }
 
 }

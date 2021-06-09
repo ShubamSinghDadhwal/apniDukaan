@@ -1,5 +1,7 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { AccountsService } from '../accounts.service';
+declare const $:any;
 
 @Component({
   selector: 'app-addsubcat',
@@ -16,11 +18,15 @@ export class AddsubcatComponent implements OnInit {
   allsubcatlist:String[];
   flag:boolean=false;
 
-  constructor(private catsrvobj: AccountsService) { 
-    this.fetchcat();
+  constructor(private catsrvobj: AccountsService, private myhttp:HttpClient) { 
+    
   }
 
   ngOnInit(): void {
+    this.scatname="";
+    this.category="";
+    this.flag=false;
+    this.fetchcat();
   }
 
   fileselected(event)
@@ -31,6 +37,7 @@ export class AddsubcatComponent implements OnInit {
 
   addsubcat()
   {
+    $("#mssg").fadeIn(1000).fadeOut(1000);
     var mydata= new FormData
 
     mydata.append("catname",this.category);
@@ -40,6 +47,7 @@ export class AddsubcatComponent implements OnInit {
     this.catsrvobj.savescat2db(mydata).subscribe({
       next:(res)=>{
         this.msg= res;
+        setTimeout(() => { this.ngOnInit() }, 1500);
       },
       error:(err)=>{
         this.msg= err;
@@ -79,6 +87,29 @@ export class AddsubcatComponent implements OnInit {
         this.msg=err;
       }
     })
+  }
+
+  scatdelete(scatid)
+  {
+      // alert(catid);
+      var confrm= confirm("Are you sure want to delete?");
+      if(confrm)
+      {
+          //note that we get a json object only as a response and not an array of objects
+          this.myhttp.delete("http://localhost:3000/delsubcat?subcatid="+scatid,{responseType:"json"}).subscribe({
+            next:(res)=>{
+              if(res["deletedCount"] == 1)
+              {
+                alert("Sub Category Deleted Successfully!")
+                this.ngOnInit();
+                //this was the best part of todays lecture used to refresh the componenet
+              }
+            },
+            error:(err)=>{
+              this.msg=err;
+            }
+          })
+      }
   }
 
 }

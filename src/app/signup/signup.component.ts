@@ -8,6 +8,7 @@ import { SignupService } from '../signup.service';
 
 import {Conn} from '../conn'
 import * as CryptoJS from 'crypto-js'
+declare const $:any;
 
 @Component({
   selector: 'app-signup',
@@ -72,6 +73,7 @@ export class SignupComponent implements OnInit {
   //SIGNUP USING SERVICES AND CLASSES
   onsignup()
   {
+    
     var encypswd= CryptoJS.AES.encrypt(this.password, Conn.skey).toString();
     // alert(encypswd);
     this.signupobj= new Signup(this.nm,this.phone,this.email,encypswd, "normal");
@@ -80,6 +82,7 @@ export class SignupComponent implements OnInit {
     this.signupservice.save2db(this.signupobj).subscribe({
       next:(resp)=>{
         this.msg= resp;
+        $("#mssg").fadeIn(1000).fadeOut(2500);
       },
       error:(err)=>{
         this.msg= err;

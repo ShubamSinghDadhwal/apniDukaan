@@ -4,6 +4,7 @@ export class Signup {
     phone:number;
     pass:string;
     usertype:string;
+    activated:boolean;
 
     constructor(nm,ph,email,pass, utype)
     {

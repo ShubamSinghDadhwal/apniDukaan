@@ -40,42 +40,49 @@ export class LoginComponent implements OnInit {
       {
         next:(res)=>
             {
-              if(res[0] == null)
+              if(res[0].activated == true)
               {
-                this.msg="Incorrect Username/Password"  
-              }
-              else
-              {
-                //28april
-                //session storage is a global storage inside browser inside which we can store key-value pairs , after storing we can fetch 
-                //those values at any page
-                var decypswd= CryptoJS.AES.decrypt(res[0].pass,Conn.skey ).toString(CryptoJS.enc.Utf8);
-                if(decypswd == this.password)
+                  if(res[0] == null)
                 {
-                  sessionStorage.setItem("pname",res[0].name);
-                  sessionStorage.setItem("username",res[0].username);
-                  sessionStorage.setItem("usertype",res[0].usertype);
-
-                  if(this.prodid!=undefined){
-                    this.myrouter.navigate(["/showpdetails"],{queryParams:{pid:this.prodid}});
-                  }
-                  else
-                  {
-                    if(res[0].usertype == "admin")
-                      {
-                          this.myrouter.navigateByUrl("/adminpanel")
-                      }
-                    else
-                      {
-                      this.myrouter.navigateByUrl("/home")
-                      }
-                      }
+                  this.msg="Incorrect Username/Password"  
                 }
                 else
                 {
-                  this.msg="Incorrect Password"
+                  //28april
+                  //session storage is a global storage inside browser inside which we can store key-value pairs , after storing we can fetch 
+                  //those values at any page
+                  var decypswd= CryptoJS.AES.decrypt(res[0].pass,Conn.skey ).toString(CryptoJS.enc.Utf8);
+                  if(decypswd == this.password)
+                  {
+                    sessionStorage.setItem("pname",res[0].name);
+                    sessionStorage.setItem("username",res[0].username);
+                    sessionStorage.setItem("usertype",res[0].usertype);
+
+                    if(this.prodid!=undefined){
+                      this.myrouter.navigate(["/showpdetails"],{queryParams:{pid:this.prodid}});
+                    }
+                    else
+                    {
+                      if(res[0].usertype == "admin")
+                        {
+                            this.myrouter.navigateByUrl("/adminpanel")
+                        }
+                      else
+                        {
+                        this.myrouter.navigateByUrl("/home")
+                        }
+                        }
+                  }
+                  else
+                  {
+                    this.msg="Incorrect Password"
+                  }
+                      
                 }
-                    
+              }
+              else
+              {
+                this.msg="Please Activate your account first"
               }
             },
             error:(err)=>{

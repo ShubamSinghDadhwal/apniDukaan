@@ -25,7 +25,16 @@ export class ShowproddetailsComponent implements OnInit {
   msg:string;
   desc:string;
 
-  constructor(private myroute:ActivatedRoute, private catsrvobj:AccountsService, private cartsrvobj:CartService, private myrouter:Router) {
+  uflag:boolean=false;
+  cartobjid:string;
+  cartprodlist:any[]
+
+  constructor(
+    private myroute:ActivatedRoute, 
+    private catsrvobj:AccountsService,
+    private cartsrvobj:CartService, 
+    private myrouter:Router
+    ) {
     this.myroute.queryParams.subscribe(
       {
         next:(resp)=>
@@ -43,6 +52,7 @@ export class ShowproddetailsComponent implements OnInit {
    }
 
   ngOnInit(): void {
+    this.showcartprod();
   }
 
   fetchproddetails()
@@ -92,6 +102,33 @@ export class ShowproddetailsComponent implements OnInit {
 
   }
 
+  showcartprod(){
+    this.cartsrvobj.fetchcart(sessionStorage.getItem("username")).subscribe({
+      next:(res:any[])=>{
+        this.cartprodlist=[];
+        this.cartprodlist= res;
+        for(var i=0;i<this.cartprodlist.length;i++)
+        {
+          if(this.prodid == this.cartprodlist[i].prodid)
+          {
+            this.uflag=true;
+            this.qty=this.cartprodlist[i].qty;
+            this.cartobjid= this.cartprodlist[i].prodid;
+            break;
+          }
+          else
+          {
+            this.uflag=false;
+          }
+        }
+        
+      },
+      error:(err)=>{
+        
+      }
+    })
+  }
+
   addtocart()
   {
     if(sessionStorage.getItem("username")!=null)
@@ -103,6 +140,40 @@ export class ShowproddetailsComponent implements OnInit {
           next:(resp:string)=>
           {
             if(resp=="success")
+            {
+              this.myrouter.navigateByUrl("/showcart");
+            }
+            else
+            {
+              this.msg="Problem while adding to cart";
+            }
+          },
+          error:(err)=>
+          {
+            alert("there is some error")
+            alert(err)
+            this.msg=err;
+          }
+        }
+      )
+    }
+    else
+    {
+      this.myrouter.navigateByUrl("/login?pid="+this.prodid);
+    }
+  }
+
+  updatecart()
+  {
+    if(sessionStorage.getItem("username")!=null)
+    {
+      var tcost=Number(this.qty)*this.remamt;
+      var mydata = {id:this.cartobjid,qty:this.qty,totalcost:tcost}
+      this.cartsrvobj.updatecart(mydata).subscribe(
+        {
+          next:(resp:any[])=>
+          {
+            if(resp["nModified"]==1)
             {
               this.myrouter.navigateByUrl("/showcart");
             }

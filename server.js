@@ -6,7 +6,10 @@ const fs= require("fs")
 const dbconfig=require('./database/db');
 // const port = process.env.PORT || 8080;
 const port= 3000;
+
+const CryptoJS= require("crypto-js");
 const nodemailer=require("nodemailer");
+
 
 //
 //to use urlencoded and json format
@@ -79,7 +82,7 @@ app.use(function (req, res, next) {
 
 
 //mongoose 15april #
-var SignupSchema = new mongoose.Schema( {name:String,phone:String,username: {type:String,unique:true}, pass: String, usertype:String}, 
+var SignupSchema = new mongoose.Schema( {name:String,phone:String,username: {type:String,unique:true}, pass: String, usertype:String, userhash:String, activated:Boolean}, 
      { versionKey: false } );
 
 var SignupModel = mongoose.model("signup", SignupSchema,"signup");
@@ -100,7 +103,8 @@ app.post("/signup", function(req, res) {
     // THE KEYS OF CLASS, SO THAT'S WHY WE HAVE TO CHANGE THE FOLLOWING MODEL APPROPRIATELY
     //
 
-    var newsignup = new SignupModel( {name:req.body.name, phone:req.body.phone, username:req.body.username, pass:req.body.pass, usertype:req.body.usertype} );
+    var uhash= CryptoJS.MD5(Date.now() ).toString();
+    var newsignup = new SignupModel( {name:req.body.name, phone:req.body.phone, username:req.body.username, pass:req.body.pass, usertype:req.body.usertype, userhash:uhash, activated:false} );
 
     // newsignup is obj, we have to create an obj in order to use a model
 
@@ -113,11 +117,58 @@ app.post("/signup", function(req, res) {
       }
       else
       {
-        // res.send("Signup Successfull");
-        res.send("Thanks for registering with us ")
+        var transporter = nodemailer.createTransport({
+          service:'gmail',
+          auth:{
+            user:'smtp.angular@gmail.com',
+            pass:'ssdadhwal'
+          }
+        });
+        var mailoptions={
+          from:'smtp.angular@gmail.com',
+          to:req.body.username,
+          subject:'Account Activation Link',
+          html: 'To Activate you account '+ 'Click <a href= "http://localhost:4200/activate?userhash=' + uhash + '"> Here </a> '
+        };
+        transporter.sendMail(mailoptions,function(error,info)
+        {
+          if(error)
+          {
+            console.log("Error sending mail" + error);
+          }
+          else
+          {
+            console.log("Mail send" + info.response);
+          }
+        });
+        
+        res.send("Signup Successfull");
+        // res.send("Thanks for registering with us ")
         // res.send(data)
         //data will contain all the data inserted by us along with the unique id of the user in the database 
         // helpful if we have to retrieve something from db
+
+      }
+      mongoose.connection.close();
+    });
+  });
+
+  app.put("/activateaccount", function(req, res) {
+    mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
+    console.log(req.body);
+  
+    SignupModel.updateOne({ _id:req.body.cartobjid}, {$set: {qty: req.body.qty }} ,function(err, data)
+    {
+      if (err)
+      {
+        console.log(err);
+        res.send("Failed");
+      }
+      else
+      {
+        console.log(data);
+        res.send(data);
+        
       }
       mongoose.connection.close();
     });
@@ -518,6 +569,49 @@ app.put("/updatesubcat", upload.single("scatpic"), function (req, res) {
   );
 });
 
+app.put("/updateprod", upload.single("newprodpic"), function (req, res) {
+  mongoose.connect(dbconfig.mongopath, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+  });
+  if (!req.file) {
+    picname = req.body.oldpicname;
+    //* copying old name into variable for retaining it inside database
+  } else {
+    if (req.body.oldpicname != "noimage.jpg") {
+      fs.unlink("src/uploads/" + req.body.oldpicname, (err) => {
+        if (err) throw err;
+        else console.log("file was deleted");
+      });
+    }
+  }
+  manageprodmodel.updateOne(
+    { _id: req.body.prodid },
+    {
+      $set: {
+        category: req.body.category,
+        subcatname: req.body.subcatname,
+        product:req.body.product,
+        prodpic:picname,
+        rate:req.body.rate,
+        discount:req.body.discount,
+        stock:req.body.stock,
+        description:req.body.description,
+        product:req.body.product,
+      },
+    },
+    function (err, data) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(data);
+        res.send(data);
+      }
+    }
+  );
+});
+
 app.get("/fetchprodbyscid", function(req, res) {
   mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
   console.log(req.query);
@@ -584,6 +678,24 @@ app.post("/addtocart", function(req, res)
       mongoose.connection.close();
     });
   });
+
+  app.put("/updatecart", function(req, res) {
+    mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
+    CartModel.updateOne({ prodid: req.body.id}, { $set: { qty: req.body.qty, totalcost: req.body.totalcost}},function(err,data) {
+      if (err)
+      {
+        console.log(err);
+        res.send("Failed");
+      }
+      else
+      {
+        console.log(data);
+        res.send(data);
+      }
+      mongoose.connection.close();
+    });
+  });
+  
 
   app.get("/fetchcart", function(req, res) {
     mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});    console.log(req.query);
@@ -833,9 +945,9 @@ app.post("/addtocart", function(req, res)
   var contactusSchema = new mongoose.Schema( {name:String,phone:String,emailid:String,message:String,msgdate:String }, { versionKey: false } );
   var contactusmodel = mongoose.model("contactus", contactusSchema,"contactus");
 
-  app.post("contactus", function(req, res) 
+  app.post("/contactus", function(req, res) 
   {
-    var dt = new Date().toLocaleString();
+      var dt = new Date().toLocaleString();
       mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
       console.log(req.body);
       var newcontactus = new contactusmodel({name:req.body.name,phone:req.body.phone,emailid:req.body.emailid,message:req.body.message,msgdate:dt } );
@@ -879,6 +991,89 @@ app.post("/addtocart", function(req, res)
       });
     });
 
+    app.delete("/delcartprod", function(req, res) {
+      mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
+      console.log(req.query);
+    
+      CartModel.remove({ _id: req.query.prodid }, function(err, data)
+      {
+        if (err)
+        {
+          console.log(err);
+          res.send("Failed");
+        }
+        else
+        {
+          console.log(data);
+          res.send(data);
+          
+        }
+        mongoose.connection.close();
+      });
+    });
+
+    app.delete("/delcat", function(req, res) {
+      mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
+      console.log(req.query);
+    
+      managecatmodel.remove({ _id: req.query.catid }, function(err, data)
+      {
+        if (err)
+        {
+          console.log(err);
+          res.send("Failed");
+        }
+        else
+        {
+          console.log(data);
+          res.send(data);
+          
+        }
+        mongoose.connection.close();
+      });
+    });
+
+    app.delete("/delsubcat", function(req, res) {
+      mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
+      console.log(req.query);
+    
+      managesubcatmodel.remove({ _id: req.query.subcatid }, function(err, data)
+      {
+        if (err)
+        {
+          console.log(err);
+          res.send("Failed");
+        }
+        else
+        {
+          console.log(data);
+          res.send(data);
+          
+        }
+        mongoose.connection.close();
+      });
+    });
+
+    app.delete("/delprod", function(req, res) {
+      mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
+      console.log(req.query);
+    
+      manageprodmodel.remove({ _id: req.query.prodid }, function(err, data)
+      {
+        if (err)
+        {
+          console.log(err);
+          res.send("Failed");
+        }
+        else
+        {
+          console.log(data);
+          res.send(data);
+          
+        }
+        mongoose.connection.close();
+      });
+    });
 
 // -------------------------------------------------------------------------------------------------------------------------------------
 

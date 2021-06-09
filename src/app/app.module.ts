@@ -36,6 +36,8 @@ import { ListofordersComponent } from './listoforders/listoforders.component';
 import { UpdatestatusComponent } from './updatestatus/updatestatus.component';
 import { SearchresultsComponent } from './searchresults/searchresults.component';
 import { ContactusComponent } from './contactus/contactus.component';
+import { ActivateComponent } from './activate/activate.component';
+import { NgImageSliderModule } from 'ng-image-slider';
 
 
 
@@ -73,13 +75,16 @@ import { ContactusComponent } from './contactus/contactus.component';
     UpdatestatusComponent,
     SearchresultsComponent,
     ContactusComponent,
+    ActivateComponent,
+    
     
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    NgImageSliderModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

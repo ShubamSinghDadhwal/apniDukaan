@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AccountsService } from '../accounts.service';
 
 declare const $:any;
@@ -21,7 +22,7 @@ export class ManagecategoryComponent implements OnInit {
   allcatlist:string[];
   flag:boolean=false;
 
-  constructor(private myhttp:HttpClient, private savecatService:AccountsService, private catsrvobj:AccountsService) { }
+  constructor(private myhttp:HttpClient, private savecatService:AccountsService, private catsrvobj:AccountsService, private myrouter:Router) { }
 
   ngOnInit(): void {
     this.fetchcat();
@@ -29,7 +30,7 @@ export class ManagecategoryComponent implements OnInit {
 
   addcategory()
   {
-    $("#mssg").fadeIn(1000).fadeOut(2500);
+    $("#mssg").fadeIn(1000).fadeOut(1000);
 
     var mydata= new FormData
     //here FormData is a class and we are creating an object of that class
@@ -51,6 +52,8 @@ export class ManagecategoryComponent implements OnInit {
     this.savecatService.savecat2db(mydata).subscribe({
       next:(res)=>{
         this.msg= res;
+        // setTimeout(() => { this.myrouter.navigateByUrl('/signup') }, 1000);
+        setTimeout(() => { this.ngOnInit() }, 1500);
       },
       error:(err)=>{
         this.msg= err;
@@ -92,11 +95,6 @@ export class ManagecategoryComponent implements OnInit {
     this.flag=false;
   }
 
-  catdelete()
-  {
-    
-  }
-
   catupdate()
   {
     var mydata= new FormData;
@@ -134,6 +132,29 @@ export class ManagecategoryComponent implements OnInit {
       }
     )
     
+  }
+
+  catdelete(catid)
+  {
+      // alert(catid);
+      var confrm= confirm("Are you sure want to delete?");
+      if(confrm)
+      {
+          //note that we get a json object only as a response and not an array of objects
+          this.myhttp.delete("http://localhost:3000/delcat?catid="+catid,{responseType:"json"}).subscribe({
+            next:(res)=>{
+              if(res["deletedCount"] == 1)
+              {
+                alert("Category Deleted Successfully!")
+                this.ngOnInit();
+                //this was the best part of todays lecture used to refresh the componenet
+              }
+            },
+            error:(err)=>{
+              this.msg=err;
+            }
+          })
+      }
   }
 
 }

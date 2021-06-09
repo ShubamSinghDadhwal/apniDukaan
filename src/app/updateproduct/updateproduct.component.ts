@@ -93,8 +93,6 @@ export class UpdateproductComponent implements OnInit {
     })
   }
 
-  
-
   fetchproddetails()
   {
     this.catsrvobj.fetchproddetailsbyid(this.prodid).subscribe(
@@ -120,9 +118,57 @@ export class UpdateproductComponent implements OnInit {
     );
   }
 
-  addproduct()
-  {
 
+  updateprod()
+  {
+    var mydata= new FormData
+
+    if(this.myfile != null) // user has chosen new file
+    {
+      mydata.append("category",this.category);
+      mydata.append("subcatname",this.subcat); 
+      mydata.append("product",this.prodname); 
+      mydata.append("newprodpic",this.myfile);  //new pic
+      mydata.append("oldpicname",this.prodimg); //sent for deletion
+      mydata.append("rate",this.rate); 
+      mydata.append("discount",this.disc); 
+      mydata.append("stock",this.stock); 
+      mydata.append("description",this.description); 
+      mydata.append("prodid",this.prodid); 
+
+
+    }
+    else
+    {
+      mydata.append("category",this.category);
+      mydata.append("subcatname",this.subcat); 
+      mydata.append("product",this.prodname); 
+      mydata.append("oldpicname",this.prodimg); //sent for retention
+      mydata.append("rate",this.rate); 
+      mydata.append("discount",this.disc); 
+      mydata.append("stock",this.stock); 
+      mydata.append("description",this.description); 
+      mydata.append("prodid",this.prodid); 
+
+    }
+
+    this.catsrvobj.updateproduct(mydata).subscribe({
+      next:(res)=>
+        {
+          if(res['nModified']==1)
+          {
+            this.msg= "Product Updated Successfully"
+          }
+          else
+          {
+            this.msg= "Product Not Updated Successfully"
+          }
+        },
+      error:(err)=>
+        {
+        }
+    })
+    
   }
 
 
