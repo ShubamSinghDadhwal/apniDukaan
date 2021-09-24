@@ -23,10 +23,12 @@ export class OrdersummaryComponent implements OnInit {
 
   fetchordernumber()
   {
+    
     this.cartsrvobj.fetchorderid(sessionStorage.getItem("username")).subscribe(
       {
         next:(resp:any[])=>
         {
+          console.log(resp);
           this.orderid=resp[0]["_id"];
           this.fetchcart();
         

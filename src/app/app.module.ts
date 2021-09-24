@@ -38,6 +38,9 @@ import { SearchresultsComponent } from './searchresults/searchresults.component'
 import { ContactusComponent } from './contactus/contactus.component';
 import { ActivateComponent } from './activate/activate.component';
 import { NgImageSliderModule } from 'ng-image-slider';
+import { ResetpasswordComponent } from './resetpassword/resetpassword.component';
+import { ResetpassComponent } from './resetpass/resetpass.component';
+
 
 
 
@@ -76,6 +79,8 @@ import { NgImageSliderModule } from 'ng-image-slider';
     SearchresultsComponent,
     ContactusComponent,
     ActivateComponent,
+    ResetpasswordComponent,
+    ResetpassComponent,
     
     
   ],
@@ -84,7 +89,7 @@ import { NgImageSliderModule } from 'ng-image-slider';
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
-    NgImageSliderModule,
+    NgImageSliderModule
   ],
   providers: [],
   bootstrap: [AppComponent]

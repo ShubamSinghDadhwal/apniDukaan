@@ -112,4 +112,9 @@ export class AccountsService {
     return this.myhttp.put(Conn.nodeurl+"/updateprod", updatedData, {responseType:"json"});
   }
 
+  setnewpass(data)
+  {
+    return this.myhttp.put(Conn.nodeurl+ "/setnewpass", data, {responseType:'json'})
+  }
+
 }

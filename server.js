@@ -10,6 +10,12 @@ const port= 3000;
 const CryptoJS= require("crypto-js");
 const nodemailer=require("nodemailer");
 
+app.use(express.static(__dirname));
+
+app.get("/", function(req, res) {
+ res.sendFile(__dirname + "/index.html");
+});
+
 
 //
 //to use urlencoded and json format
@@ -103,7 +109,7 @@ app.post("/signup", function(req, res) {
     // THE KEYS OF CLASS, SO THAT'S WHY WE HAVE TO CHANGE THE FOLLOWING MODEL APPROPRIATELY
     //
 
-    var uhash= CryptoJS.MD5(Date.now() ).toString();
+    var uhash = CryptoJS.MD5(Date.now() + req.body.username).toString();
     var newsignup = new SignupModel( {name:req.body.name, phone:req.body.phone, username:req.body.username, pass:req.body.pass, usertype:req.body.usertype, userhash:uhash, activated:false} );
 
     // newsignup is obj, we have to create an obj in order to use a model
@@ -157,7 +163,7 @@ app.post("/signup", function(req, res) {
     mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
     console.log(req.body);
   
-    SignupModel.updateOne({ _id:req.body.cartobjid}, {$set: {qty: req.body.qty }} ,function(err, data)
+    SignupModel.updateOne({ userhash:req.body.uhash}, {$set: {activated: true }} ,function(err, data)
     {
       if (err)
       {
@@ -300,7 +306,7 @@ app.put("/changepass", function(req, res) {
   mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
   console.log(req.body);
 
-  SignupModel.updateOne({ username:req.body.uname, pass:req.body.cpass}, {$set: {pass:req.body.npass}} ,function(err, data)
+  SignupModel.updateOne({ username:req.body.uname}, {$set: {pass:req.body.npass}} ,function(err, data)
   {
     if (err)
     {
@@ -727,7 +733,10 @@ app.post("/addtocart", function(req, res)
 
       console.log(req.body);
 
-      var orddt = new Date().toLocaleString();
+      // var orddt = new Date().toLocaleString();
+      
+      var orddt = new Date().toLocaleString("en-GB");
+      
 
       var newcheckout = new CheckoutModel({username:req.body.username, billamt:req.body.billamt,orderdt:orddt,status:req.body.status,saddress:req.body.saddress,pmode:req.body.pmode,coname:req.body.coname,cardno:req.body.cardno,holdername:req.body.holdername,cvv:req.body.cvv,exp:req.body.exp} );
 
@@ -747,6 +756,7 @@ app.post("/addtocart", function(req, res)
     });
 
     app.get("/getordernum", function(req, res) {
+
       mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
       CheckoutModel.find({ username: req.query.un}, function(err, data) {
         if (err)
@@ -758,9 +768,10 @@ app.post("/addtocart", function(req, res)
         {
           console.log(data);
           res.send(data);
+
         }
         mongoose.connection.close();
-      }).sort({"orderdt":-1});
+      }).sort({orderdt:-1});
       //using above we are fetching all the oderes of current user
       //by sorting it to desc- we are fetching the latest order to first 
     });
@@ -947,7 +958,8 @@ app.post("/addtocart", function(req, res)
 
   app.post("/contactus", function(req, res) 
   {
-      var dt = new Date().toLocaleString();
+     
+      var dt = new Date().toLocaleString("en-GB");
       mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
       console.log(req.body);
       var newcontactus = new contactusmodel({name:req.body.name,phone:req.body.phone,emailid:req.body.emailid,message:req.body.message,msgdate:dt } );
@@ -1074,6 +1086,129 @@ app.post("/addtocart", function(req, res)
         mongoose.connection.close();
       });
     });
+
+
+
+//RESET PASSWORD THROUGH EMAIL
+
+var resetpasswordschema = new mongoose.Schema({username:String,userhash:String,exptime:String}, { versionKey: false } );
+var resetpassModel = mongoose.model("resetpass",resetpasswordschema,"resetpass");
+
+app.post("/resetpassword", function(req, res) {
+  
+  mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
+  console.log(req.body);
+  SignupModel.find({ username:req.body.uname}, function(err, data)
+  {
+    if (err)
+    {
+      console.log(err);
+      res.send(err);
+    }
+    else
+    {
+      console.log(data);
+      if(data.length==0)
+      {
+        res.send("Incorrect Username");
+      }
+      else
+      {
+        var uhash = CryptoJS.MD5(Date.now() + req.body.username).toString();
+        var minutesToAdd=15;
+        var currentDate = new Date();
+        var futureDate = new Date(currentDate.getTime() + minutesToAdd*60000);
+        console.log(futureDate.toString());
+        mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
+        console.log(req.body);
+        var newreset = new resetpassModel({username:req.body.uname,userhash:uhash,exptime:futureDate} );
+        newreset.save(function(err) 
+        {
+            if (err)
+            {
+              console.log(err);
+              res.send(err);
+            }
+            else
+            {
+              var transporter = nodemailer.createTransport({
+                 service:'gmail',
+                 auth:{
+                   user:'smtp.angular@gmail.com',
+                   pass:'ssdadhwal'
+                 }
+              });
+              var mailoptions={
+                from:'smtp.angular@gmail.com',
+                to:req.body.uname,
+                subject:'Password Reset Mail',
+                html:'Hello ' + data[0].name + "<br><br> Click on the following link to reset your password.<br><br> <a href='http://localhost:4200/resetpass?code=" + uhash + "'>Reset Password</a>"
+              };
+              transporter.sendMail(mailoptions,function(error,info)
+              {
+                if(error)
+                {
+                  console.log("Error sending mail" + error);
+                }
+                else
+                {
+                  console.log("Mail send" + info.response);
+                }
+              });
+              res.send("Reset Password mail sent successfully, please check your mail to reset password");
+            }
+            mongoose.connection.close();
+        });
+      }
+    }
+  });
+});
+
+app.get("/checktime", function(req, res) {
+  mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
+  console.log(req.query);
+  resetpassModel.find({ userhash:req.query.hash}, function(err, data)
+  {
+    if (err)
+    {
+      console.log(err);
+      res.send(err);
+    }
+    else
+    {
+      console.log(data);
+      res.send(data);
+    }
+    mongoose.connection.close();
+  });
+});
+
+app.put("/setnewpass", function(req, res) {
+  mongoose.connect(dbconfig.mongopath, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true});
+  console.log(req.body);
+
+  SignupModel.updateOne({ username:req.body.uname}, {$set: {pass:req.body.npass}} ,function(err, data)
+  {
+    if (err)
+    {
+      console.log(err);
+      res.send(err);
+    }
+
+    else
+    {
+      
+      console.log(data);
+      res.send(data);
+      
+    }
+    mongoose.connection.close();
+  });
+});
+
+
+
+
 
 // -------------------------------------------------------------------------------------------------------------------------------------
 

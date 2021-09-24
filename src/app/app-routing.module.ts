@@ -18,6 +18,8 @@ import { ManageproductComponent } from './manageproduct/manageproduct.component'
 import { OrderdetailsComponent } from './orderdetails/orderdetails.component';
 import { OrderhistoryComponent } from './orderhistory/orderhistory.component';
 import { OrdersummaryComponent } from './ordersummary/ordersummary.component';
+import { ResetpassComponent } from './resetpass/resetpass.component';
+import { ResetpasswordComponent } from './resetpassword/resetpassword.component';
 import { SearchresultsComponent } from './searchresults/searchresults.component';
 import { SearchuserComponent } from './searchuser/searchuser.component';
 import { ShowcartComponent } from './showcart/showcart.component';
@@ -153,6 +155,15 @@ const routes: Routes = [
     path:"activate",
     component:ActivateComponent
   },
+  {
+    path:"resetpassword",
+    component:ResetpasswordComponent
+  },
+  {
+    path:"resetpass",
+    component:ResetpassComponent
+  },
+  
 ];
 
 @NgModule({

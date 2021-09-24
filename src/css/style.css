@@ -192,7 +192,6 @@ button.w3view-cart:focus{
 	font-size: 40px;
     color: #fe9126;
     text-decoration: none;
-    text-transform: uppercase;
     display: block;
     line-height: 1;
 }
