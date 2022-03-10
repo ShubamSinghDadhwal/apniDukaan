@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { CartService } from '../cart.service';
-
+import {Conn} from '../conn';
 @Component({
   selector: 'app-showcart',
   templateUrl: './showcart.component.html',
@@ -59,7 +59,7 @@ export class ShowcartComponent implements OnInit {
       if(confrm)
       {
           //note that we get a json object only as a response and not an array of objects
-          this.myhttp.delete("http://localhost:3000/delcartprod?prodid="+prodid,{responseType:"json"}).subscribe({
+          this.myhttp.delete(Conn.nodeurl + "/delcartprod?prodid="+prodid,{responseType:"json"}).subscribe({
             next:(res)=>{
               if(res["deletedCount"] == 1)
               {

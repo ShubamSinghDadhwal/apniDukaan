@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-
+import {Conn} from '../conn';
 @Component({
   selector: 'app-searchresults',
   templateUrl: './searchresults.component.html',
@@ -34,7 +34,7 @@ export class SearchresultsComponent implements OnInit {
 
   searchprods()
   {
-    this.myhttp.get("http://localhost:3000/fetchproductbyname?s=" + this.searchtxt,{responseType:"json"}).subscribe(
+    this.myhttp.get(Conn.nodeurl + "/fetchproductbyname?s=" + this.searchtxt,{responseType:"json"}).subscribe(
       {
         next:(resp:any[])=>
         {

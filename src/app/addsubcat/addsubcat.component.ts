@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { AccountsService } from '../accounts.service';
 declare const $:any;
-
+import {Conn} from '../conn'
 @Component({
   selector: 'app-addsubcat',
   templateUrl: './addsubcat.component.html',
@@ -96,7 +96,7 @@ export class AddsubcatComponent implements OnInit {
       if(confrm)
       {
           //note that we get a json object only as a response and not an array of objects
-          this.myhttp.delete("http://localhost:3000/delsubcat?subcatid="+scatid,{responseType:"json"}).subscribe({
+          this.myhttp.delete(Conn.nodeurl + "/delsubcat?subcatid="+scatid,{responseType:"json"}).subscribe({
             next:(res)=>{
               if(res["deletedCount"] == 1)
               {

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AccountsService } from '../accounts.service';
-
+import {Conn} from '../conn'
 declare const $:any;
 
 @Component({
@@ -141,7 +141,7 @@ export class ManagecategoryComponent implements OnInit {
       if(confrm)
       {
           //note that we get a json object only as a response and not an array of objects
-          this.myhttp.delete("http://localhost:3000/delcat?catid="+catid,{responseType:"json"}).subscribe({
+          this.myhttp.delete(Conn.nodeurl + "/delcat?catid="+catid,{responseType:"json"}).subscribe({
             next:(res)=>{
               if(res["deletedCount"] == 1)
               {

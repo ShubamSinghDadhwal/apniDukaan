@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { AccountsService } from '../accounts.service';
 import { Signup } from '../signup';
-
+import {Conn} from '../conn'
 @Component({
   selector: 'app-listofmembers',
   templateUrl: './listofmembers.component.html',
@@ -50,7 +50,7 @@ export class ListofmembersComponent implements OnInit {
       if(confrm)
       {
           //note that we get a json object only as a response and not an array of objects
-          this.myhttp.delete("http://localhost:3000/deluser?uid="+memid,{responseType:"json"}).subscribe({
+          this.myhttp.delete(Conn.nodeurl + "/deluser?uid="+memid,{responseType:"json"}).subscribe({
             next:(res)=>{
               if(res["deletedCount"] == 1)
               {
