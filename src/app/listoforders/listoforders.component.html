@@ -12,28 +12,32 @@
     <div class="container">
         <h3 class="w3_agile_header">List of Orders</h3>
         <br/><br/>
-        <table class="timetable_sub">
-            <thead>
-                <tr>
-                    <th>SL No.</th>	
-                    <th>Order ID</th>
-                    <th>Amount</th>
-                    <th>Payment Mode</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Update Status</th>
+        <div class="table">
+            <table class="timetable_sub">
+                <thead>
+                    <tr>
+                        <th>SL No.</th>	
+                        <th>Order ID</th>
+                        <th>Amount</th>
+                        <th>Payment Mode</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Update Status</th>
+                    </tr>
+                </thead>
+                <tr class="rem1" *ngFor="let x of orderlist; index as i">
+                    <td class="invert">{{i+1}}</td>
+                    <td class="invert"><a routerLink="/orderdetails" [queryParams]="{oid:x._id}">{{x._id}}</a></td>
+                    <td class="invert">{{x.billamt}}</td>
+                    <td class="invert">{{x.pmode}}</td>
+                    <td class="invert">{{x.orderdt}}</td>
+                    <td class="invert">{{x.status}}</td>
+                    <td class="invert"><a routerLink="/updatestatus" [queryParams]="{oid:x._id}">Update</a></td>
                 </tr>
-            </thead>
-            <tr class="rem1" *ngFor="let x of orderlist; index as i">
-                <td class="invert">{{i+1}}</td>
-                <td class="invert"><a routerLink="/orderdetails" [queryParams]="{oid:x._id}">{{x._id}}</a></td>
-                <td class="invert">{{x.billamt}}</td>
-                <td class="invert">{{x.pmode}}</td>
-                <td class="invert">{{x.orderdt}}</td>
-                <td class="invert">{{x.status}}</td>
-                <td class="invert"><a routerLink="/updatestatus" [queryParams]="{oid:x._id}">Update</a></td>
-            </tr>
-        </table>
-        {{msg}}
+            </table>
+        </div>
+        <div class="message">
+            {{msg}}
+        </div>
     </div>
 </div>

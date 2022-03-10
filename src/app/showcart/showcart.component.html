@@ -12,27 +12,29 @@
     <div class="container">
         <h3 class="w3_agile_header">Shopping Cart</h3>
         <br/><br/>
-        <table class="timetable_sub">
-            <thead>
-                <tr>
-                    <th>Picture</th>
-                    <th>Name</th>
-                    <th>Rate</th>
-                    <th>Quantity</th>
-                    <th>Total Cost</th>
-                    <th>Delete</th>
+        <div class="table">
+            <table class="timetable_sub">
+                <thead>
+                    <tr>
+                        <th>Picture</th>
+                        <th>Name</th>
+                        <th>Rate</th>
+                        <th>Quantity</th>
+                        <th>Total Cost</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tr class="rem1" *ngFor="let x of cartprods">
+                    <td class="invert"><img src="uploads/{{x.picture}}" height="100"></td>
+                    <td class="invert">{{x.prodname}}</td>
+                    <td class="invert">{{x.rate}}</td>
+                    <td class="invert">{{x.qty}}</td>
+                    <td class="invert">{{x.totalcost}}</td>
+                    <td><button type="button" class="btn btn-danger" (click)="ondelete(x._id)">Delete</button>
+                    </td>
                 </tr>
-            </thead>
-            <tr class="rem1" *ngFor="let x of cartprods">
-                <td class="invert"><img src="uploads/{{x.picture}}" height="100"></td>
-                <td class="invert">{{x.prodname}}</td>
-                <td class="invert">{{x.rate}}</td>
-                <td class="invert">{{x.qty}}</td>
-                <td class="invert">{{x.totalcost}}</td>
-                <td><button type="button" class="btn btn-danger" (click)="ondelete(x._id)">Delete</button>
-                </td>
-            </tr>
-        </table>
+            </table>
+        </div>
         Your total cost is Rs.{{gtotal}}<br/>
 
         {{msg}}<br>

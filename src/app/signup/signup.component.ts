@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 // keep in mind we have to import HttpClietn form /common
 
@@ -18,15 +19,22 @@ declare const $:any;
 export class SignupComponent implements OnInit {
 
   nm:string;
-  phone:number;
+  phone:string;
   msg:string;
   email:string;
   password:string;
+  confirmPassword:string;
+  disableRegister:boolean = true;
+  acceptCheckbox:boolean;
   
   signupobj:Signup
 
   //here we are creating obj of Http Client so that we can use it form data transfer
-  constructor(private myhttp: HttpClient, private signupservice:SignupService) { }
+  constructor(private myhttp: HttpClient, private myrouter:Router, private signupservice:SignupService) {
+    if(sessionStorage.getItem("pname")) {
+      this.myrouter.navigateByUrl("/home")
+    }
+   }
 
   //here package.json file is already present so no need to create it again.
   // also in latest angualar versions - express, bodyparser, nodemon are already pr so no need to install them too 
@@ -73,22 +81,33 @@ export class SignupComponent implements OnInit {
   //SIGNUP USING SERVICES AND CLASSES
   onsignup()
   {
-    
-    var encypswd= CryptoJS.AES.encrypt(this.password, Conn.skey).toString();
-    // alert(encypswd);
-    this.signupobj= new Signup(this.nm,this.phone,this.email,encypswd, "normal");
-    
-    //here save2db type is observer
-    this.signupservice.save2db(this.signupobj).subscribe({
-      next:(resp)=>{
-        this.msg= resp;
-        $("#mssg").fadeIn(1000).fadeOut(2500);
-      },
-      error:(err)=>{
-        this.msg= err;
-      }
-    })
-    
+    let checkForEmptyFields = [this.nm, this.email, this.phone, this.password, this.confirmPassword].filter(field => field == undefined || field == "").length;
+    console.log("ssd", this.phone, checkForEmptyFields)
+    if(checkForEmptyFields) {
+      this.msg = "Please Fill out all the fields!"
+      $("#msg").fadeIn(1000).fadeOut(2500);
+    }
+    else if(this.password != this.confirmPassword) {
+      this.msg = "Passwords Doesn't Match"
+      $("#msg").fadeIn(1000).fadeOut(2500);
+    }
+    else {
+      this.disableRegister = false;
+      var encypswd= CryptoJS.AES.encrypt(this.password, Conn.skey).toString();
+      // alert(encypswd);
+      this.signupobj= new Signup(this.nm,this.phone,this.email,encypswd, "normal");
+      
+      //here save2db type is observer
+      this.signupservice.save2db(this.signupobj).subscribe({
+        next:(resp)=>{
+          this.msg= resp;
+          $("#msg").fadeIn(1000).fadeOut(2500);
+        },
+        error:(err)=>{
+          this.msg= err;
+        }
+      })
+    }
   }
 
 }

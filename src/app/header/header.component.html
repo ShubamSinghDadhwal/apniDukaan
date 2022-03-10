@@ -7,25 +7,26 @@
         <div class="agile-login">
            
             <ul *ngIf="!loginStatus">
-                <li><a routerLink="signup" (click)="setTitle('Signup')"  >Join</a></li>
+                <li><a routerLink="signup" (click)="setTitle('Signup')">Join</a></li>
                 <li><a routerLink="login" (click)="setTitle('Login')"> Login</a></li>
                 <li><a routerLink="contactus" (click)="setTitle('Login')"> Contact us</a></li>
             </ul>
 
             <ul *ngIf="loginStatus">
-                <li><a routerLink="/orderhistory" (click)="setTitle('Order History')"  >Order History</a></li>
-                <li><a routerLink="/changepswd" (click)="setTitle('Login')"> change password</a></li>
-                <li><a routerLink="/logout" (click)="setTitle('Signup')"  >logout</a></li>
+                <li><a routerLink="/orderhistory" (click)="setTitle('Order History')">Orders</a></li>
+                <li><a routerLink="/changepswd" (click)="setTitle('Login')">Settings</a></li>
+                <li><a routerLink="/logout" (click)="setTitle('Signup')">logout</a></li>
                 
             </ul>
         </div>
 
         <div class="product_list_header" >  
                 <form action="#" method="post" class="last" > 
-                    <input type="hidden" name="cmd" value="_cart">
-                    <input type="hidden" name="display" value="1">
                     <button class="w3view-cart" type="submit" name="submit" value="" routerLink="/showcart" *ngIf="loginStatus">
                         <i class="fa fa-cart-arrow-down" aria-hidden="true"></i>
+                    </button>
+                    <button class="w3view-cart" type="submit" name="submit" value="" routerLink="/showcat" *ngIf="!loginStatus">
+                        <i class="fa fa-shopping-bag" aria-hidden="true"></i>
                     </button>
                 </form>  
         </div>
@@ -43,7 +44,7 @@
             </ul>
         </div>
         <div class="w3ls_logo_products_left">
-            <h1><a href="index.html">Apni Dukaan</a></h1>
+            <h1><a routerLink="/">Apni Dukaan</a></h1>
         </div>
         <div class="w3l_search">
             <form action="#" method="post">
@@ -66,5 +67,5 @@
 
 <div *ngIf="!admin_header">
     <app-normalheader></app-normalheader>
-    </div>
+</div>
     

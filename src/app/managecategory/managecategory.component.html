@@ -34,25 +34,27 @@
     <div class="container">
         <h3 class="w3_agile_header">Manage Category </h3>
         <br><br>
-        <table class="timetable_sub">
-            <thead>
-                <tr>
-                    <th>SL No.</th>	
-                    <th>Picture</th>
-                    <th>Name</th>
-                    <th>Update</th>
-                    <th>Delete</th>
+        <div class="table">
+            <table class="timetable_sub">
+                <thead>
+                    <tr>
+                        <th>SL No.</th>	
+                        <th>Picture</th>
+                        <th>Name</th>
+                        <th>Update</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+    
+                <tr *ngFor="let x of allcatlist; index as i">
+                    <td>{{i+1}}</td>
+                    <td><img src="uploads/{{x.categorypic}}" height=75 ></td>
+                    <td>{{x.categoryname}}</td>
+                    <td> <button type="button" class="btn btn-success" (click)=onupdate(x._id,x.categoryname,x.categorypic)>Update</button> </td>
+                    <td> <button type="button" class="btn btn-danger" (click)=catdelete(x._id)>Delete</button> </td>
                 </tr>
-            </thead>
-
-            <tr *ngFor="let x of allcatlist; index as i">
-                <td>{{i+1}}</td>
-                <td><img src="uploads/{{x.categorypic}}" height=75 ></td>
-                <td>{{x.categoryname}}</td>
-                <td> <button type="button" class="btn btn-success" (click)=onupdate(x._id,x.categoryname,x.categorypic)>Update</button> </td>
-                <td> <button type="button" class="btn btn-danger" (click)=catdelete(x._id)>Delete</button> </td>
-            </tr>
-        </table>
+            </table>
+        </div>
 
     </div>
 </div>

@@ -6,8 +6,7 @@ import {Conn} from '../conn';
 import * as CryptoJS from 'crypto-js'
 import { CookieService } from 'ngx-cookie-service';
 import { Signup } from '../signup';
-
-
+declare const $:any;
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -39,9 +38,10 @@ export class LoginComponent implements OnInit {
         {
           next:(resp:Signup[])=>
           {
-            if(resp[0]==null)
+            if(resp?.[0]==null)
             {
-              //this.msg="Incorrect Username";
+              this.msg="Incorrect Username";
+              $("#msg").fadeIn(1000).fadeOut(2500);
             }
             else
             {
@@ -52,17 +52,18 @@ export class LoginComponent implements OnInit {
                   sessionStorage.setItem("pname",resp[0].name);
                   sessionStorage.setItem("username",resp[0].username);
                   sessionStorage.setItem("usertype",resp[0].usertype);
-
-                    if(resp[0].usertype=="admin")
-                    {
-                      this.myrouter.navigateByUrl("/adminpanel");
-                    }
-                    else
-                    {
-                      this.myrouter.navigateByUrl("/home")
-                    }
+                  if(resp[0].usertype=="admin")
+                  {
+                    this.myrouter.navigateByUrl("/adminpanel");
+                  }
+                  else
+                  {
+                    this.myrouter.navigateByUrl("/home")
+                  }
                 }
-
+              } else {
+                this.msg = "Please Activate Your Account!"
+                $("#msg").fadeIn(1000).fadeOut(2500);
               }
               
             }
@@ -82,26 +83,16 @@ export class LoginComponent implements OnInit {
 
   onlogin()
   {
-   
-    
-    // alert(decypswd);
     this.loginservice.login(this.username).subscribe(
       {
         next:(res)=>
             {
-              if(res[0].activated == true)
+              if(res[0])
               {
-                  if(res[0] == null)
+                var decypswd= CryptoJS.AES.decrypt(res[0].pass,Conn.skey ).toString(CryptoJS.enc.Utf8);
+                if(decypswd == this.password)
                 {
-                  this.msg="Incorrect Username/Password"  
-                }
-                else
-                {
-                  //28april
-                  //session storage is a global storage inside browser inside which we can store key-value pairs , after storing we can fetch 
-                  //those values at any page
-                  var decypswd= CryptoJS.AES.decrypt(res[0].pass,Conn.skey ).toString(CryptoJS.enc.Utf8);
-                  if(decypswd == this.password)
+                  if(res?.[0]?.activated == true)
                   {
                     if(this.rembme==true)
                     {
@@ -112,40 +103,35 @@ export class LoginComponent implements OnInit {
                     sessionStorage.setItem("username",res[0].username);
                     sessionStorage.setItem("usertype",res[0].usertype);
 
-                    if(this.prodid!=undefined){
+                    if(this.prodid!=undefined)
                       this.myrouter.navigate(["/showpdetails"],{queryParams:{pid:this.prodid}});
-                    }
                     else
                     {
                       if(res[0].usertype == "admin")
-                        {
-                            this.myrouter.navigateByUrl("/adminpanel")
-                        }
+                        this.myrouter.navigateByUrl("/adminpanel")
                       else
-                        {
-                        this.myrouter.navigateByUrl("/home")
-                        }
-                        }
+                      this.myrouter.navigateByUrl("/home")
+                    }
                   }
-                  else
-                  {
-                    this.msg="Incorrect Password"
+                  else {
+                    this.msg="To Proceed Ahead, First Activate your account."
                   }
-                      
+                }
+                else {
+                  this.msg="Incorrect Password"
                 }
               }
-              else
-              {
-                this.msg="Please Activate your account first"
+              else {
+                this.msg = "User Doesn't Exist, Please Create your Account First!"
+                $("#msg").fadeIn(1000).fadeOut(500);
               }
             },
-            error:(err)=>{
-            }
-          }
-        )
+        error:(err)=>{
+        }
       }
-
-    }
+    )
+  }
+}
 
 
    

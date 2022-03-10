@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-home',
@@ -6,24 +6,10 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
+  screenHeight: number;
+  screenWidth: number;
+  showHeader:boolean=true;
 
-  // imageObject: Array<object> = [
-  //     {
-  //       image: 'images/11.jpg',
-  //       thumbImage: 'images/11.jpg',
-  //       title: 'Buy Rice Products Are Now On Line With Us'
-  //     },
-  //     {
-  //       image: 'images/22.jpg',
-  //       thumbImage: 'images/22.jpg',
-  //       title: 'Whole Spices Products Are Now On Line With Us'
-  //     },
-  //     {
-  //       image: 'images/44.jpg',
-  //       thumbImage: 'images/44.jpg',
-  //       title: 'Whole Spices Products Are Now On Line With Us'
-  //     }, 
-  // ];
   imageObject: Array<object> = [
     {
       image: 'images/banner.jpg',
@@ -37,16 +23,24 @@ export class HomeComponent implements OnInit {
       alt: 'banner 2',
       title: 'title 2 of image',
     },
-    {
-      image: 'images/banner3.jpg',
-      thumbImage: 'images/44.jpg',
-      alt: 'banner 3',
-      title: 'title 3 of image',
-    },
   ];
-  constructor() { }
+  constructor() { 
+    this.getScreenSize();
+  }
 
   ngOnInit(): void {
   }
+
+  @HostListener('window:resize', ['$event'])
+    getScreenSize(event?) {
+      this.screenHeight = window.innerHeight;
+      this.screenWidth = window.innerWidth;
+      console.log(this.screenHeight, this.screenWidth);
+      if(this.screenWidth < 800)
+        this.showHeader = false;
+      else 
+        this.showHeader = true;
+      } 
+      
 
 }

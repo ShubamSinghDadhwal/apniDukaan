@@ -13,23 +13,16 @@
                         </div> 
                         <div class="collapse navbar-collapse" id="bs-megadropdown-tabs">
                             <ul class="nav navbar-nav">
-                                <li class="active"><a routerLink="/" class="act">Home</a></li>	
+                                <li class="active"><a routerLink="/" class="act" class="add-space">Home</a></li>	
                                 <!-- Mega Menu -->
                                 
                                 <li *ngFor="let x of allcatlist">
-                                    <a routerLink="/showscat" [queryParams]="{cid: x._id}">
+                                    <a routerLink="/showscat" [queryParams]="{cid: x._id}" class="add-space">
                                         {{x.categoryname}}
                                      </a>
-                                </li>	
-                                <!-- <li> <a routerLink="">Household</a></li>
-                                
-                                <li> <a routerLink="" >Personal Care</a></li> -->
+                                </li>
                                
-                                <!-- <li> <a routerLink="" >Packaged Foods</a></li> -->
-                               
-                                <!-- <li> <a routerLink="" >Beverages</a></li> -->
-                               
-                                <li> <a routerLink="contactus">Contact Us</a></li>
+                                <li> <a routerLink="contactus" class="add-space">Contact Us</a></li>
                             </ul>
                         </div>
                         </nav>
